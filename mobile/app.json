@@ -8,7 +8,9 @@
     "scheme": "pigpt",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/images/app-icon.png"
+      "icon": "./assets/images/app-icon.png",
+      "bundleIdentifier": "com.tp53health.pigpt",
+      "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
@@ -17,7 +19,8 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.tp53health.pigpt"
     },
     "web": {
       "bundler": "metro",
