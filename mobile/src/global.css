@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import "nativewind/theme";
+
+:root {
+  --background: #f5f5f5;
+  --surface: #ffffff;
+  --surface-secondary: #f8f9fb;
+
+  --primary: #4a90e2;
+  --primary-hover: #357abd;
+  --primary-light: #dbeafe;
+
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-muted: #6b7280;
+
+  --border-light: #e5e7eb;
+  --border-medium: #d1d5db;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--text-primary);
+  font-family: Inter, sans-serif;
+}
+
+@layer components {
+  .card {
+    @apply bg-white rounded-2xl border border-border-light shadow-soft;
+  }
+
+  .primary-btn {
+    @apply bg-primary px-5 py-2.5 rounded-xl text-white font-medium;
+  }
+
+  .primary-btn:hover {
+    background-color: var(--primary-hover);
+  }
+
+  .secondary-btn {
+    @apply bg-gray-100 text-text-secondary px-5 py-2 rounded-xl;
+  }
+
+  .input {
+    @apply bg-white border border-border-light rounded-2xl px-4 py-3 outline-none;
+  }
+
+  .sidebar-item {
+    @apply flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200;
+  }
+
+  .sidebar-item:hover {
+    @apply bg-white shadow-soft;
+  }
+
+  .tab-active {
+    @apply bg-primary text-white rounded-xl;
+  }
+
+  .tab {
+    @apply px-4 py-2 text-text-secondary rounded-xl;
+  }
+}

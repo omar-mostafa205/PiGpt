@@ -1,0 +1,192 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─────────────────────────────────────────────
+// USER
+// Mirrors Clerk — clerkId is the source of truth
+// Created via Clerk webhook on sign-up
+// ─────────────────────────────────────────────
+model User {
+  id         String     @id @default(cuid())
+  clerkId    String     @unique
+  email      String     @unique
+  firstName  String?
+  lastName   String?
+  gradeLevel GradeLevel @default(high_school)
+  subjects   Subject[] // selected during onboarding
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  // Relations
+  problems Problem[]
+  progress Progress[]
+  quizzes  Quiz[]
+  notes    Note[]
+  streak   Streak?
+
+  @@index([clerkId])
+}
+
+// ─────────────────────────────────────────────
+// PROBLEM
+// Every question the user submits to the solver
+// Powers: progress tab, weak topics, activity feed
+// Written by: solveController → saveProblem()
+// ─────────────────────────────────────────────
+model Problem {
+  id        String   @id @default(cuid())
+  userId    String
+  subject   Subject
+  question  String   @db.Text
+  answer    String   @db.Text
+  topic     String? // e.g. "Calculus — Integration" — extracted by Claude
+  correct   Boolean? // null until user marks it or quiz grades it
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, subject])
+  @@index([userId, createdAt])
+  @@index([userId, correct])
+}
+
+// ─────────────────────────────────────────────
+// PROGRESS
+// One row per user per subject
+// Written by: solveController → upsertProgress()
+//             quizController  → updateSubjectAccuracy()
+// Read by:    progressController → getProgress()
+// ─────────────────────────────────────────────
+model Progress {
+  id          String   @id @default(cuid())
+  userId      String
+  subject     Subject
+  accuracy    Int      @default(0) // 0–100 rolling average
+  streak      Int      @default(0) // consecutive days of practice
+  totalSolved Int      @default(0) // lifetime problem count for this subject
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, subject], name: "userId_subject")
+  @@index([userId])
+}
+
+// ─────────────────────────────────────────────
+// STREAK
+// One row per user — updated on every solve
+// Tracks daily consistency for the streak calendar
+// ─────────────────────────────────────────────
+model Streak {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  current      Int      @default(0) // consecutive days active
+  longest      Int      @default(0) // all-time best streak
+  lastSolvedAt DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ─────────────────────────────────────────────
+// QUIZ
+// A completed quiz attempt — preset or custom
+// Written by: quizController → submitQuiz()
+// Read by:    quizController → getQuizHistory()
+//             quizController → updateSubjectAccuracy()
+// ─────────────────────────────────────────────
+model Quiz {
+  id          String     @id @default(cuid())
+  userId      String
+  subject     Subject
+  topic       String // e.g. "Algebra Basics" or custom user input
+  difficulty  Difficulty
+  gradeLevel  GradeLevel @default(high_school)
+  questions   String[] // question text array — matches submitSchema
+  score       Int        @default(0) // 0–100 percentage
+  isCustom    Boolean    @default(false)
+  completedAt DateTime   @default(now())
+  createdAt   DateTime   @default(now())
+
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  questionDetails QuizQuestion[] // detailed breakdown stored after grading
+
+  @@index([userId])
+  @@index([userId, subject])
+  @@index([completedAt])
+}
+
+// ─────────────────────────────────────────────
+// QUIZ QUESTION
+// Detailed per-question breakdown inside a quiz
+// Stored after grading so the user can review answers
+// ─────────────────────────────────────────────
+model QuizQuestion {
+  id           String   @id @default(cuid())
+  quizId       String
+  questionText String   @db.Text
+  options      Json // string[4] — the four multiple choice options
+  correctIndex Int // 0–3
+  explanation  String   @db.Text
+  userAnswer   Int? // index the user chose — null = unanswered
+  isCorrect    Boolean? // null until answered
+  createdAt    DateTime @default(now())
+
+  quiz Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  @@index([quizId])
+}
+
+// ─────────────────────────────────────────────
+// NOTE
+// A saved lecture summary produced from a recording
+// Written by: summarizeController → /api/summarize
+// Read by:    notesController      → /api/notes
+// ─────────────────────────────────────────────
+model Note {
+  id         String   @id @default(cuid())
+  userId     String
+  title      String
+  summary    String   @db.Text
+  keyPoints  String[]
+  topics     String[]
+  followUps  String[]
+  subject    Subject?
+  durationMs Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, createdAt])
+}
+
+// ─────────────────────────────────────────────
+// ENUMS
+// ─────────────────────────────────────────────
+enum Subject {
+  math
+  physics
+  chemistry
+  accounting
+}
+
+enum GradeLevel {
+  middle_school
+  high_school
+  ap_ib
+  university
+  self_study
+}
+
+enum Difficulty {
+  easy
+  medium
+  hard
+}
