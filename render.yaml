@@ -1,0 +1,35 @@
+# Render blueprint for the PiGPT API.
+#
+# Deploy: push this file, then in Render choose New > Blueprint and point it at
+# this repo. Secrets are marked sync:false so they are entered in the dashboard
+# and never live in git.
+services:
+  - type: web
+    name: pigpt-api
+    runtime: node
+    plan: free
+    rootDir: backend
+    # postinstall runs `prisma generate`; start runs `prisma migrate deploy`.
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+
+      # Neon connection string, including ?sslmode=require
+      - key: DIRECT_URL
+        sync: false
+
+      # Google AI Studio key. Enable billing — the free tier is 20 requests/day.
+      - key: GEMINI_API_KEY
+        sync: false
+
+      - key: CLERK_SECRET_KEY
+        sync: false
+      - key: CLERK_PUBLISHABLE_KEY
+        sync: false
+
+      # Only needed if a browser calls the API; the mobile app sends no Origin.
+      - key: CORS_ORIGINS
+        value: ""
