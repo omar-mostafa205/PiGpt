@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import { z } from "zod";
-import { callGemini } from "../services/ai/gemini.js";
+import { callAI } from "../services/ai/provider.js";
+import { audio, text } from "../services/ai/types.js";
 import { logger } from "../utils/logger.js";
 import { prisma } from "../services/storage/neonStorage.js";
 
@@ -42,18 +43,18 @@ export const summarizeController = async (
   const userId = req.clerkAuth!.userId;
 
   try {
-    const raw = await callGemini({
+    const raw = await callAI({
       systemPrompt: SYSTEM_PROMPT,
       messages: [
         {
           role: "user",
           parts: [
-            { inlineData: { data: audioBase64, mimeType } },
-            {
-              text: subject
+            audio(audioBase64, mimeType),
+            text(
+              subject
                 ? `Summarise this ${subject} lecture recording.`
-                : "Summarise this lecture recording.",
-            },
+                : "Summarise this lecture recording."
+            ),
           ],
         },
       ],

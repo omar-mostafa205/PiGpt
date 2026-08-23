@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 import { z } from "zod";
-import { callGemini } from "../services/ai/gemini.js";
+import { callAI } from "../services/ai/provider.js";
 import { buildPrompt } from "../services/ai/buildPrompt.js";
 import { parseAIResponse } from "../services/ai/parseResponse.js";
 import { saveProblem, upsertProgress } from "../services/storage/neonStorage.js";
@@ -52,7 +52,7 @@ export const solveController = async (
     });
 
     // 3. Call Gemini
-    const rawResponse = await callGemini({ systemPrompt, messages });
+    const rawResponse = await callAI({ systemPrompt, messages });
 
     // 4. Parse structured response
     const parsedResponse = parseAIResponse(rawResponse);

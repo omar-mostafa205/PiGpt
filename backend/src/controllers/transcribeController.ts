@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import { z } from "zod";
-import { callGemini } from "../services/ai/gemini.js";
+import { callAI } from "../services/ai/provider.js";
+import { audio, text as textPart } from "../services/ai/types.js";
 import { logger } from "../utils/logger.js";
 
 const schema = z.object({
@@ -23,15 +24,12 @@ export const transcribeController = async (req: Request, res: Response, next: Ne
   const { audioBase64, mimeType } = parsed.data;
 
   try {
-    const raw = await callGemini({
+    const raw = await callAI({
       systemPrompt: SYSTEM_PROMPT,
       messages: [
         {
           role: "user",
-          parts: [
-            { inlineData: { data: audioBase64, mimeType } },
-            { text: "Transcribe this." },
-          ],
+          parts: [audio(audioBase64, mimeType), textPart("Transcribe this.")],
         },
       ],
       maxTokens: 1200,

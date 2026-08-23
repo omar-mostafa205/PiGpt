@@ -16,6 +16,7 @@ interface LibraryStore {
   loading: boolean;
   loaded: boolean;
   refresh: () => Promise<void>;
+  reset: () => void;
 }
 
 export const useLibraryStore = create<LibraryStore>((set) => ({
@@ -24,6 +25,8 @@ export const useLibraryStore = create<LibraryStore>((set) => ({
   notes: [],
   loading: false,
   loaded: false,
+
+  reset: () => set({ recents: [], quizzes: [], notes: [], loaded: false }),
 
   refresh: async () => {
     set({ loading: true });

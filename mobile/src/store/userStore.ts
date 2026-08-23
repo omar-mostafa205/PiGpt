@@ -20,6 +20,8 @@ interface UserStore {
   toggleSubject: (s: OnboardingSubject) => void;
   setSource: (s: Source) => void;
   completeOnboarding: () => void;
+  /** Clear in-memory answers; the storage scope changes separately. */
+  reset: () => void;
 }
 
 export const useUserStore = create<UserStore>((set, get) => ({
@@ -71,6 +73,9 @@ export const useUserStore = create<UserStore>((set, get) => ({
     set({ source });
     storageSet(STORAGE_KEYS.SOURCE, source);
   },
+
+  reset: () =>
+    set({ role: null, goal: null, subjects: [], source: null, onboardingDone: false, gradeLevel: null }),
 
   completeOnboarding: () => {
     set({ onboardingDone: true });

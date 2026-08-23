@@ -21,7 +21,13 @@ services:
       - key: DIRECT_URL
         sync: false
 
-      # Google AI Studio key. Enable billing — the free tier is 20 requests/day.
+      # OpenRouter — serves text and image requests on a free model.
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: OPENROUTER_MODEL
+        value: nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free
+
+      # Gemini — audio only (lecture summaries, dictation).
       - key: GEMINI_API_KEY
         sync: false
 

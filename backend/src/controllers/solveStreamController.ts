@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import { z } from "zod";
-import { streamGemini } from "../services/ai/gemini.js";
+import { streamAI } from "../services/ai/provider.js";
 import { buildPrompt } from "../services/ai/buildPrompt.js";
 import { parseAIResponse } from "../services/ai/parseResponse.js";
 import { prisma } from "../services/storage/neonStorage.js";
@@ -70,7 +70,7 @@ export const solveStreamController = async (req: Request, res: Response) => {
       imageBase64,
     });
 
-    for await (const delta of streamGemini({ systemPrompt, messages })) {
+    for await (const delta of streamAI({ systemPrompt, messages })) {
       answer += delta;
       send({ type: "text", value: delta });
     }

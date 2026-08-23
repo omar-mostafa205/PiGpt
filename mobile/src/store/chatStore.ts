@@ -26,6 +26,8 @@ interface ChatStore {
     createdAt: string;
   }) => void;
   clearChat: (subject: Subject) => void;
+  /** Drop every thread from memory, e.g. when the account changes. */
+  resetAll: () => void;
   /** Abort the in-flight answer; whatever streamed so far is kept. */
   stopStreaming: () => void;
   setError: (err: string | null) => void;
@@ -194,6 +196,12 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   clearChat: (subject) => {
     set((state) => ({ messages: { ...state.messages, [subject]: [] } }));
     chatService.saveHistory(subject, []);
+  },
+
+  resetAll: () => {
+    inFlight?.abort();
+    inFlight = null;
+    set({ messages: emptyMessages, isLoading: false, error: null });
   },
 
   setError: (err) => set({ error: err }),

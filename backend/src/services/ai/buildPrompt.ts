@@ -1,4 +1,4 @@
-import type { Content } from "@google/genai";
+import { text, image, type AIMessage } from "./types.js";
 
 type Subject = "math" | "physics" | "chemistry" | "accounting";
 type GradeLevel =
@@ -24,7 +24,7 @@ interface BuildPromptOptions {
 
 interface BuiltPrompt {
   systemPrompt: string;
-  messages: Content[];
+  messages: AIMessage[];
 }
 
 // ── Per-subject personas ───────────────────────────────────────────────────
@@ -99,20 +99,12 @@ export function buildPrompt({
     FORMAT_INSTRUCTIONS,
   ].join("\n\n");
 
-  const messages: Content[] = [
-    ...history.map((m) => ({
-      role: m.role === "assistant" ? "model" : "user",
-      parts: [{ text: m.content }],
-    })),
-    imageBase64
-      ? {
-          role: "user",
-          parts: [
-            { inlineData: { data: imageBase64, mimeType } },
-            { text: question },
-          ],
-        }
-      : { role: "user", parts: [{ text: question }] },
+  const messages: AIMessage[] = [
+    ...history.map((m) => ({ role: m.role, parts: [text(m.content)] })),
+    {
+      role: "user" as const,
+      parts: imageBase64 ? [image(imageBase64, mimeType), text(question)] : [text(question)],
+    },
   ];
 
   return { systemPrompt, messages };

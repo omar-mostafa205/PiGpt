@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
 import { z } from "zod";
-import { callGemini } from "../services/ai/gemini.js";
+import { callAI } from "../services/ai/provider.js";
+import { text } from "../services/ai/types.js";
 import { prisma } from "../services/storage/neonStorage.js";
 import { logger } from "../utils/logger.js";
 import type { Subject, Difficulty } from "@prisma/client";
@@ -44,9 +45,9 @@ Schema:
   const userMessage = `Generate a ${difficulty} ${subject} quiz on "${topic}" with ${questionCount} multiple-choice questions.`;
 
   try {
-    const raw = await callGemini({
+    const raw = await callAI({
       systemPrompt,
-      messages: [{ role: "user", parts: [{ text: userMessage }] }],
+      messages: [{ role: "user", parts: [text(userMessage)] }],
       maxTokens: 4000,
     });
 

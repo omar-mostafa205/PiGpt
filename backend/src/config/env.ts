@@ -5,6 +5,9 @@ const envSchema = z.object({
   DIRECT_URL: z.string().min(1, "DIRECT_URL is required"),
   GEMINI_API_KEY: z.string().min(1, "GEMINI_API_KEY is required"),
   GEMINI_MODEL: z.string().default("gemini-3.6-flash"),
+  /** OpenRouter serves text and image requests on a free model. */
+  OPENROUTER_API_KEY: z.string().min(1, "OPENROUTER_API_KEY is required"),
+  OPENROUTER_MODEL: z.string().default("nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free"),
   CLERK_SECRET_KEY: z.string().min(1, "CLERK_SECRET_KEY is required"),
   CLERK_PUBLISHABLE_KEY: z.string().min(1, "CLERK_PUBLISHABLE_KEY is required"),
   PORT: z.coerce.number().default(3000),
