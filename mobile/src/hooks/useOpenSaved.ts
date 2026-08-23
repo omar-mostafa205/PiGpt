@@ -18,7 +18,7 @@ export function useOpenSaved() {
   return useCallback(
     async (id: string) => {
       closeOverlays();
-      router.push("/(tabs)");
+      router.navigate("/(tabs)");
       try {
         const { problem } = await progressApi.getProblem(id);
         setSubject(problem.subject);

@@ -39,8 +39,8 @@ export const ToolsSheet: React.FC<{ handlers?: ToolHandlers }> = ({ handlers }) 
   const run = (action: Action) => {
     closeOverlays();
     if (action === "quiz") openQuiz();
-    else if (action === "camera") router.push("/(tabs)/camera");
-    else if (action === "voice") router.push("/(tabs)/voice");
+    else if (action === "camera") router.navigate("/(tabs)/camera");
+    else if (action === "voice") router.navigate("/(tabs)/voice");
     else if (action === "math") handlers?.onMathInput?.();
     else if (action === "pdf") handlers?.onUploadPdf?.();
     else if (action === "photo") handlers?.onPickPhoto?.();

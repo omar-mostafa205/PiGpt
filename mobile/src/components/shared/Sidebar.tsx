@@ -65,7 +65,9 @@ export const Sidebar: React.FC = () => {
 
   const go = (path: string) => {
     closeOverlays();
-    router.push(path);
+    // navigate (not push) so switching tabs runs the tab transition rather
+    // than stacking a duplicate screen on top.
+    router.navigate(path);
   };
 
   return (

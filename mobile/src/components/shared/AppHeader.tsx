@@ -48,7 +48,7 @@ export const AppHeader: React.FC<{
             );
           }
           return (
-            <Pressable key={seg.mode} onPress={() => router.replace(seg.path)} style={s.segBtn} hitSlop={4}>
+            <Pressable key={seg.mode} onPress={() => router.navigate(seg.path)} style={s.segBtn} hitSlop={4}>
               <Icon name={seg.icon} size={seg.w} height={seg.h} color={T.muted} strokeWidth={1.6} />
             </Pressable>
           );

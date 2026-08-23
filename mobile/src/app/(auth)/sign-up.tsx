@@ -129,7 +129,7 @@ export default function SignUp() {
   // ── Sign-up screen ───────────────────────────────────────────────────────
   return (
     <ImageBackground
-      source={require("../../../assets/images/on.png")}
+      source={require("../../../assets/images/onboarding.png")}
       resizeMode="cover"
       className="flex-1"
     >

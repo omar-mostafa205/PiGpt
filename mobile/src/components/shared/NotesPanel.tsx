@@ -42,7 +42,7 @@ export const NotesPanel: React.FC = () => {
 
   const go = (path: string) => {
     closeOverlays();
-    router.push(path);
+    router.navigate(path);
   };
 
   return (

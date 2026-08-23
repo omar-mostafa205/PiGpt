@@ -1,0 +1,16 @@
+{
+  "name": "pigpt",
+  "version": "1.0.0",
+  "private": true,
+  "description": "PiGPT — AI study assistant. The Expo app is in mobile/, the API in backend/. Neither is an npm workspace; these scripts just run the right command in the right folder.",
+  "scripts": {
+    "start": "cd mobile && npm run start",
+    "android": "cd mobile && npm run android",
+    "ios": "cd mobile && npm run ios",
+    "lint": "cd mobile && npm run lint",
+    "api": "cd backend && npm run dev",
+    "api:build": "cd backend && npm run build",
+    "seed": "cd backend && npm run seed",
+    "setup": "cd mobile && npm install && cd ../backend && npm install"
+  }
+}

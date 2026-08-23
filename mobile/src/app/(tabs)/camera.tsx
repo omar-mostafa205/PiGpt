@@ -37,7 +37,7 @@ export default function CameraScreen() {
   const subjectWord = config.shortLabel.toLowerCase();
 
   const solve = (base64: string) => {
-    router.push("/(tabs)");
+    router.navigate("/(tabs)");
     send(`Solve this ${subjectWord} problem from my photo`, base64);
   };
 

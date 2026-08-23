@@ -86,7 +86,7 @@ export default function SolverScreen() {
   };
 
   const suggestions: { label: string; icon: IconName; run: () => void }[] = [
-    { label: "Scan a problem", icon: "navCamera", run: () => router.push("/(tabs)/camera") },
+    { label: "Scan a problem", icon: "navCamera", run: () => router.navigate("/(tabs)/camera") },
     { label: "Upload a worksheet", icon: "paperclip", run: attachPdf },
   ];
 
