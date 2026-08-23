@@ -6,6 +6,7 @@ import { parseAIResponse } from "../services/ai/parseResponse.js";
 import { prisma } from "../services/storage/neonStorage.js";
 import { upsertProgress } from "../services/storage/neonStorage.js";
 import { logger } from "../utils/logger.js";
+import { ensureUser } from "../services/storage/ensureUser.js";
 
 const solveSchema = z.object({
   question: z.string().min(1).max(5000),
@@ -53,15 +54,33 @@ export const solveStreamController = async (req: Request, res: Response) => {
     res.write(`${JSON.stringify(event)}\n`);
   };
 
-  // Persist the turn up front so the conversation exists even if this dies.
-  const problem = await prisma.problem.create({
-    data: { userId, subject, question, answer: "", topic: null, correct: null },
-  });
-  send({ type: "problem", problemId: problem.id });
+  /**
+   * Insert the turn. A foreign key violation means the User row is missing —
+   * it can be deleted straight from the database — so recreate it and retry
+   * once rather than failing the whole request.
+   */
+  const createProblem = async (): Promise<string> => {
+    const data = { userId, subject, question, answer: "", topic: null, correct: null };
+    try {
+      return (await prisma.problem.create({ data })).id;
+    } catch (err) {
+      if ((err as { code?: string })?.code !== "P2003") throw err;
+      logger.warn(`Missing User row, recreating | id=${userId}`);
+      await ensureUser(userId, true);
+      return (await prisma.problem.create({ data })).id;
+    }
+  };
 
   let answer = "";
+  let problemId: string | null = null;
 
   try {
+    // Persist the turn up front so the conversation exists even if this dies.
+    // Inside the try: headers are already flushed, so a throw here would reach
+    // Express and corrupt the stream instead of reporting a usable error.
+    problemId = await createProblem();
+    send({ type: "problem", problemId });
+
     const { systemPrompt, messages } = buildPrompt({
       question,
       subject,
@@ -89,8 +108,8 @@ export const solveStreamController = async (req: Request, res: Response) => {
     // Runs on success, failure and client abort alike.
     const { topic, finalAnswer } = parseAIResponse(answer);
     try {
-      await prisma.problem.update({
-        where: { id: problem.id },
+      if (problemId) await prisma.problem.update({
+        where: { id: problemId },
         // Store the whole reply so the conversation can be reopened intact;
         // `topic` carries the short label for lists.
         data: { answer: answer || finalAnswer, topic },

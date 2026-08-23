@@ -12,9 +12,16 @@ export const errorHandler = (
   err: Error,
   _req: Request,
   res: Response,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _next: NextFunction
+  next: NextFunction
 ) => {
+  // A streaming route has already flushed its headers. Writing JSON on top of
+  // that throws ERR_HTTP_HEADERS_SENT and corrupts the response the client is
+  // mid-way through parsing, which surfaces as "cannot parse response".
+  if (res.headersSent) {
+    logger.error("Error after headers sent", err);
+    return next(err);
+  }
+
   // Multer file errors (wrong type, size exceeded)
   if (isQuotaError(err)) {
     return res.status(429).json({

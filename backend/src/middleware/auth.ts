@@ -15,8 +15,18 @@ export const authMiddleware = async (
     }
 
     req.clerkAuth = { userId: auth.userId };
-    // Guarantees the row every write's foreign key points at.
-    await ensureUser(auth.userId);
+
+    // Guarantees the row every write's foreign key points at. A failure here is
+    // not an auth problem, so it must not be reported as one.
+    try {
+      await ensureUser(auth.userId);
+    } catch (err) {
+      logger.error("ensureUser failed", err);
+      return res.status(503).json({
+        error: "Could not prepare your account. Please try again.",
+      });
+    }
+
     return next();
   } catch (err) {
     logger.warn("Auth failed", { error: (err as Error).message });
