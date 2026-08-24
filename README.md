@@ -1,7 +1,7 @@
 # PiGPT
 
 <p align="center">
-  <img src="mobile/assets/images/pigpt.png" alt="PiGPT" width="220" />
+  <img src="mobile/assets/images/pigpt.png" alt="PiGPT running on iPhone" width="100%" />
 </p>
 
 <p align="center">
