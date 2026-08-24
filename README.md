@@ -1,8 +1,8 @@
+<img src="mobile/assets/images/app-icon.png" alt="PiGPT app icon" width="160" />
+
 # PiGPT
 
-<p align="center">
-  <img src="mobile/assets/images/pigpt.png" alt="PiGPT running on iPhone" width="100%" />
-</p>
+<img src="mobile/assets/images/pigpt.png" alt="PiGPT running on iPhone" width="100%" />
 
 <p align="center">
   <strong>A consumer AI study app for Math, Physics, Chemistry and Accounting.</strong><br/>
